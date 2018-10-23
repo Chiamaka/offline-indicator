@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@redux-offline/redux-offline": "^2.4.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-scripts": "2.0.5"
+    "react-redux": "^5.0.7",
+    "react-scripts": "2.0.5",
+    "react-spring": "^5.9.2",
+    "redux": "^4.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

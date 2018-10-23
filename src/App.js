@@ -1,28 +1,59 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { connect } from 'react-redux';
+import InternetSign from './InternetSign';
+import { activeOnline, closeWidget, deactiveOnline } from './actions/index';
 
 class App extends Component {
+  state = { online: false };
+  componentDidMount() {
+    this.changeOnlineStatus(true);
+  }
+  changeOnlineStatus = online => {
+    if (online) {
+      setTimeout(() => {
+        this.props.activeOnline();
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        this.props.deactiveOnline();
+      }, 1000);
+    }
+
+    setTimeout(() => {
+      this.props.closeWidget();
+    }, 5000);
+  };
+
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+    const { connecting, connected, message } = this.props;
+    console.log('connecting::', connecting);
+    console.log('connected::', connected);
+    console.log('message::', message);
+    return <InternetSign connecting={connecting} connected={connected} message={message} />;
   }
 }
+const mapDispatchToProps = dispatcher => {
+  return {
+    activeOnline: () => dispatcher(activeOnline(dispatcher)),
+    closeWidget: () => dispatcher(closeWidget()),
+    deactiveOnline: () => dispatcher(deactiveOnline())
+  };
+};
 
-export default App;
+const mapStateToProps = state => {
+  const { online: internetState, offline } = state;
+  console.log('state:::', state);
+  const { connecting, connected, message } = internetState;
+  const { online } = offline;
+  return {
+    connecting,
+    connected,
+    message,
+    online
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
