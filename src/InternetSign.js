@@ -1,6 +1,10 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Spring, animated, config } from 'react-spring';
 import './App.css';
+
+const HEIGHT = 30;
+const WIDTH = 30;
+const EXPANDED_WIDTH = 200;
 
 const color = {
   offline: 'rgba(0,0,0,0.5)',
@@ -9,35 +13,36 @@ const color = {
 
 const style = {
   container: {
-    height: 100,
-    width: 100,
+    height: HEIGHT,
+    width: WIDTH,
     position: 'fixed',
     bottom: 10,
     left: 20,
-    willChange: 'boxShadow, background',
+    willChange: 'box-shadow, width',
     display: 'flex',
-    justifyContent: 'flex-start',
     alignItems: 'center',
     cursor: 'pointer',
-    borderRadius: 5
-    // backgroundColor: 'rgba(0,0,0,0.1)'
+    borderRadius: 2,
+    padding: '3px 5px'
   }
 };
 
-const pages = [
-  style => <animated.p className="test">Connection lost</animated.p>,
-  style => <animated.p className="test">Attempting to reconnect</animated.p>,
-  style => <animated.p className="test">Reconnected!</animated.p>
-];
-
 const Content = ({ styles, connected, message }) => {
-  const { shadow, width, color, toggle } = styles;
+  const { shadow, width, color, background } = styles;
   return (
-    <animated.div style={{ ...style.container, boxShadow: shadow, width }}>
+    <animated.div
+      style={{
+        ...style.container,
+        boxShadow: shadow,
+        width,
+        background
+      }}
+      title={`You are ${connected ? 'connected' : 'not connected'}`}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="100"
-        height="100"
+        width={WIDTH}
+        height={HEIGHT}
         viewBox="0 0 24 24"
         fill={color}
       >
@@ -47,50 +52,32 @@ const Content = ({ styles, connected, message }) => {
         </g>
       </svg>
       {message ? <animated.p className="test">{message}</animated.p> : null}
-      {/* <Transition
-        from={{ opacity: 0 }}
-        enter={{ opacity: 1 }}
-        leave={{ opacity: 0, transform: 'translate3d(-50%,0,0)' }}
-      >
-        {styles => {
-          return state.toggle && state.connecting ? pages[state.index](styles) : null;
-        }}
-      </Transition> */}
     </animated.div>
   );
 };
 
 class InternetSign extends Component {
-  state = { toggle: false, connecting: false, index: 0, online: false, message: '' };
-
-  toggle = () => this.setState(state => ({ toggle: !state.toggle }));
-  changeText = e => this.setState(state => ({ index: state.index === 2 ? 0 : state.index + 1 }));
-
   render() {
-    // const toggle = this.state.toggle;
-    const { message, connecting, connected } = this.props;
+    // console.log(this.props);
+    const { message, connected } = this.props;
     return (
       <Spring
         to={{
           color: connected ? color.online : color.offline,
-          shadow: message ? '1px 1px 6px #333' : '0px 0px 0px #333',
-          width: message ? 400 : 100
+          shadow: message ? '0px 1px 6px rgba(0, 0, 0, 0.4)' : '0px 0px 0px #333',
+          width: message ? EXPANDED_WIDTH : WIDTH,
+          background: message ? '#fff' : '#f7f7f7'
         }}
-        // children={Content}
         config={config.gentle}
-        onStart={() => this.setState({ connecting: false })}
-        onRest={() => this.setState({ connecting: true })}
       >
         {styles => {
           return (
-            <Fragment>
-              <Content
-                styles={styles}
-                connected={connected}
-                message={message}
-                changeText={this.changeText}
-              />
-            </Fragment>
+            <Content
+              styles={styles}
+              connected={connected}
+              message={message}
+              changeText={this.changeText}
+            />
           );
         }}
       </Spring>
